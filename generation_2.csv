@@ -1,0 +1,359 @@
+mol_id	SMILES
+mol_0	C=C1OC2=C(OC1=O)C(=O)C(=O)C1=C2OCOC1=O
+mol_1	N#CC(C#N)=c1cc(N2CC2=O)c2c(O)c(CO)cc3ccnc1c32
+mol_2	CCN1C(=O)[C@@H](C)Oc2c1ccc1c2C(=O)C=C(C)C1=O
+mol_3	COC(=O)C1=CC(O)=c2c(c(O)/c(=C/C=C/C=C(C)C)oc2=O)C1=O
+mol_4	COc1cc(/C=C/c2ccc(OC)c(O[C@@H]3C=C(C)COC3=O)c2)ccc1C#N
+mol_5	CCN(C)/C=N/C(=O)c1ccc(C(=O)OC2=CC=C3O[C@]4(C(=O)O)OCOc5c(C)cccc5N4N=C3C2=O)c(O)c1
+mol_6	[H]OC1=C([H])C(OC([H])([H])[H])=C2C(=O)C3=C([H])C([H])=C([H])C(O[H])=C3C(=O)C2=C1C1=C([H])C(C(=O)C([H])=C=C2C(=O)C(N([H])[H])=C([H])C([H])=C2C(=O)OC([H])([H])[H])=C([H])C([H])=C1OC([H])([H])[H]
+mol_7	COc1ccc(-c2sc(C#N)c(O)c2O)cc1OC
+mol_8	O=c1ccc(=O)c2c(O)c3c(O)c4c(=O)c5c(=O)c6c(=O)nnc(=O)c6c(=O)c5c(=O)c4c(O)c3c(O)c12
+mol_9	Cc1c(O)c2c(=O)c(=O)c(C)c3c(=O)c4c5c6c(cc(S(N)(=O)=O)cc6c(=O)c1c-5c23)c(=O)c4=O
+mol_10	COC(=O)c1[nH]c(O)c2c(=O)c(/N=c3\c(F)cc4c(O)c(=O)c(=O)nc-4c3=O)cc(OC)c-2c1O
+mol_11	Cc1cc(-c2ccccc2N(C)c2ccc(O)c(=O)o2)nc2c1CCC1=C2C(O)=CC(=O)C1=O
+mol_12	CC(=O)/C=C/C(=O)/C=C/C(C)=C(/C)C(=O)/N=C1\C=C/C(=C\C=C2\C=C3C=NC([C@@]4(F)CCC(=O)O4)=CN3C(=O)C2=O)C=C1N
+mol_13	CC(=O)[C@H]1CC(=O)O/C1=C\COc1c(C)c(O)c(Br)c(O)c1C1=CC(Br)=C/C(=C2\Nc3c(oc(=O)c4c3OC[C@H](C)O4)CO2)C1=O
+mol_14	CC(=O)O[C@H](CCOc1cc(CO)c2c3c(ccc(O)c13)CO[C@H]2CCO)[C@@H](C)OC(=O)c1cc(O)c2c(c1O)C(=O)C=C(O)C2=O
+mol_15	C=C1N=c2c3nc(N)[nH]oc3c3cc4cc5c(nc4c4c6ccc(S(=O)(=O)Cl)cc6c(c2c34)C1=O)C=C/C(=C1/C=C(/C=C/c2ccc(OC)c(OCC=C(C)C)c2)OC2=C1O[C@@H](C)C(/C=C/c1cc(O)c(CC)cc1O)=C2)C5
+mol_16	N#Cc(c(N=O)c1N)c(/C=C2N3C=CC(ON3N4[C@H]5OC([C@H]6C(C(N\24)=C65)=O)=O)=O)c7c1nsc7
+mol_17	C=C/C(C)=C\C=C\C1=C2C(=O)C=c3oc4ccc(N(c5ccc(/C=C/c6ccc(C)cc6)c(-c6cc(N)ncc6F)c5)c5ccc6c(C#N)cc(F)nc6c5)cc4c(=O)c3=C2[C@@H](CO)C(=O)O1
+mol_18	CCN(C)c1ccc2c(c1)c1nc(/N=C3/C=C4OS(=O)(=O)N=C4C([C@H]4CCC(O)(O)[C@H](c5ccccc5)O4)=C3)nc3c(O)c4c5c6c(c(OC)c2c5c31)O[C@H]1C(=O)[C@@]6(OC2=C(C)C(=O)C3=C(C(=O)CCC3)[C@@H]21)c1c-4ccc(C(=O)OC)c1C
+mol_19	COC1=NN=C(c2cc(O)cc(OC)c2)OO1
+mol_20	C/C=C/CCC1=NN=C([C@@H](C)CC)OO1
+mol_21	CC[C@H](O)CNc1ccc(/C=C/N(C)/C=C\N[C@@H]2CC2=O)cc1O
+mol_22	CNC(=O)OC[C@]1(O)[C@H](C)n2c3c(c(=O)c4c(C(=O)OC)c(O)cc(c42)[C@@H]1O)C=CC(C)(C)O3
+mol_23	CC[C@H](C)OC(=O)Oc1cc(OC(=O)c2cc(O)ccc2O)c(C)c(O)c1C/C(O)=C(\C)CCC(=O)OC
+mol_24	C/N=C1\C=C/C(=C\C=C2\C=C(c3ccc4c(c3)CSc3c(N[C@@H](C)[C@@H](C)OC(C)=O)ccc(O)c3-4)C=CN2)C(=O)O1
+mol_25	C=C1C(=O)C=C2C(=O)c3c(c(O)c4c(c3O)c(O)c(/C(=C3\C=CC=CC3=O)c3ccc(NCCCC)cc3)c3cc(O)c(O)cc34)C(=O)C2=C1O
+mol_26	CC1=CC(n2c(=O)c(=O)c3c4c(c(=O)/c(=N\N=C5\C=C(F)C(O)=CC5=O)c2=3)C(=O)[C@@H](OC(C)(C)[C@@H](C)O)c2c(O)cccc2-4)=C/C(=c2\ccc(Br)c3c2=N3)N1
+mol_27	CCOC(=O)c1c(O)c(O)cc(-c2c(O)cc(C(=O)Oc3c(/C=C/C(C)=O)c(C=O)c(OC(C)=O)c4oc5c(O)c6c(c(O)c5c(=O)c34)C(=O)C(=O)/C(=C\C=C\C(C)=C(/C#N)C(=O)OC)C6=O)c(O)c2O)c1C(C)=O
+mol_28	NC1=NN=C(OCCO)OO1
+mol_29	Cc1ccc(-c2ccc(-c3cccc(F)c3)s2)cc1
+mol_30	CSc1ccc([C@@H]2C=c3nc4c(C)cc5nnc(N)c(=O)c5c4oc3=CC2=O)cc1
+mol_31	CCc1ccc([C@@]2(C)ON=C3CCc4c(OC)c5c(c(O)c6c(=O)cc(C)c7[nH]c(=O)cc5c76)c(=O)c4=C3O2)c(O)n1
+mol_32	Cc1cc(=O)c2c3oc(=O)c4c5cc(O)c(=O)c6c5c5c(c(=O)c7c(-c8cccnc8)c(=O)c8c(C)c(=O)c(c2c1=O)c1c8c7c5c4c31)C(=O)[C@@]6(C)CO
+mol_33	CCOc1cc2c(cc1C)[nH]c(=S)c1ccc(Oc3cc(OC/C=C(\C)C(=O)OC)c4c(=O)c5c(O)c(C=O)c(O)cc5cc-4o3)cc12
+mol_34	[H]/N=C\c1c(Nc2ccc(O)c(O)c2)oc2c(c(NC)cc3oc4c(O)c(/C=C/C=C(C(/[O-])=N/S(=O)#[O+])\c5cc(O)c([C@H](C)O)cc5O)cc(O)c4c(=O)c32)c1=O
+mol_35	C[C@H]1O[C@](C)(Oc2cccc(O)c2)C(=O)C1=O
+mol_36	NC(=O)OCc1ccc(O[C@@H]2OCCO[C@H]2Cl)c(O)c1
+mol_37	COC1=CC=c2c(c3oc(=O)cc4c3=c(oc3c(=O)c(=O)ccc43)c2=O)C1=O
+mol_38	O=Cc1ccc(-c2ccc(Oc3ccc(C(F)(F)F)cc3)cc2O)cc1O
+mol_39	CCN1C(=O)N=c2c(ccc(C#N)/c2=C2\C=CC(=O)[C@@](OC)([C@H](C)O)O2)C1=O
+mol_40	O=C1/C(=C\O)c2cc(-c3cc(Br)c4c(c3O)C(=O)C=C(C(F)(F)F)C4=O)ccc2-c2cc(O)ccc21
+mol_41	COc1cc(C(=O)C2=C(O)/C(=C(O)/C=C/c3ccc(C)cc3O)C(=O)C=C2)c(O)c(O)c1C=O
+mol_42	CC[C@@H]1Nc2nn([C@@H](C)C(C)(C)C)c(=O)c3c2c2c(c4nc(N)nnc43)C(=O)OCN21
+mol_43	CCCC[C@@H](C)OC(=O)c1c(O)cc2c(oc(=O)c3c(CCC)nc(-c4ccc5c(c4)NC[C@@H](CO)N5)nc32)c1C
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

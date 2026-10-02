@@ -1,0 +1,81 @@
+# @package _global_
+defaults:
+  - override /run: gschnet_run
+  - override /globals: gschnet_globals
+  - override /task: gschnet_task
+  - override /data: custom_data
+  - override /callbacks:
+      - checkpoint
+      - earlystopping
+      - lrmonitor
+      - progressbar
+      - modelsummary
+  - override /model: gschnet
+  - _self_
+
+run:
+  path: /data/horse/ws/gigi895h-generative_project/gigi895h-QM9_gen_alpha/generative_project/models/unconditioned_experiment
+  id: ${globals.id}
+  work_dir: ${hydra:runtime.cwd}
+  data_dir: ${run.work_dir}/
+
+globals:
+  lr: 1e-4
+  model_cutoff: 10.0
+  prediction_cutoff: 5.0
+  placement_cutoff: 2.2
+  use_covalent_radii: True
+  covalent_radius_factor: 1.2
+  atom_types: [5, 35, 6, 17, 9, 32, 1, 53, 7, 8, 15, 16, 34]
+  origin_type: 121
+  focus_type: 122
+  stop_type: 123
+  draw_random_samples: 5
+  data_workdir: null
+  cache_workdir: null
+  name: unconditioned
+  id: ${oc.env:SLURM_JOBID,{uuid:1}}_${oc.env:HOSTNAME,""}
+
+data:
+  batch_size: 2
+  num_train: 152
+  num_val: 20
+  datapath: /data/horse/ws/gigi895h-generative_project/gigi895h-QM9_gen_alpha/generative_ps/dataset_ps.db
+  num_workers: 6
+  num_val_workers: 4
+  num_test_workers: 4
+  distance_unit: Ang
+  property_units:
+    energy_U0: Hartree
+
+  transforms:
+    - _target_: schnetpack.transform.SubtractCenterOfMass
+    - _target_: schnetpack_gschnet.transform.OrderByDistanceToOrigin
+    - _target_: schnetpack_gschnet.transform.GeneralCachedNeighborList
+      cache_path: ${run.path}/${run.id}/cache
+      keep_cache: False
+      cache_workdir: ${globals.cache_workdir}
+      neighbor_list:
+        _target_: schnetpack_gschnet.transform.ConditionalGSchNetNeighborList
+        model_cutoff: ${globals.model_cutoff}
+        prediction_cutoff: ${globals.prediction_cutoff}
+        placement_cutoff: ${globals.placement_cutoff}
+        use_covalent_radii: ${globals.use_covalent_radii}
+        covalent_radius_factor: ${globals.covalent_radius_factor}
+
+    - _target_: schnetpack_gschnet.transform.BuildAtomsTrajectory
+      centered: True
+      origin_type: ${globals.origin_type}
+      focus_type: ${globals.focus_type}
+      stop_type: ${globals.stop_type}
+      draw_random_samples: ${globals.draw_random_samples}
+      sort_idx_i: False
+
+    - _target_: schnetpack.transform.CastTo32
+
+callbacks:
+  early_stopping:
+    patience: 25
+
+  progress_bar:
+    refresh_rate: 100

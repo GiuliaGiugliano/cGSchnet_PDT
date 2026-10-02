@@ -1,0 +1,158 @@
+# @package _global_
+defaults:
+  - override /run: gschnet_run
+  - override /globals: gschnet_globals
+  - override /task: gschnet_task
+  - override /data: custom_data
+  - override /callbacks:
+      - checkpoint
+      - earlystopping
+      - lrmonitor
+      - progressbar
+      - modelsummary
+  - override /model: gschnet
+  - override /model/conditioning: gap_relenergy
+  - _self_
+
+run:
+  # Prova a usare il percorso del progetto dove hai già lavorato finora
+  path: /data/horse/ws/gigi895h-generative_project/gigi895h-QM9_gen_alpha/models/multicond_pca
+  id: ${globals.id}
+  work_dir: ${hydra:runtime.cwd}
+  data_dir: ${run.work_dir}/
+
+globals:
+  lr: 1e-4
+  model_cutoff: 10.0
+  prediction_cutoff: 5.0
+  placement_cutoff: 2.2
+  use_covalent_radii: True
+  covalent_radius_factor: 1.2
+  atom_types: [5, 35, 6, 17, 9, 32, 1, 53, 7, 8, 15, 16, 34]
+  origin_type: 121
+  focus_type: 122
+  stop_type: 123
+  draw_random_samples: 5
+  data_workdir: null
+  cache_workdir: null
+  name: multicond
+  id: ${oc.env:SLURM_JOBID,{uuid:1}}_${oc.env:HOSTNAME,""}
+
+data:
+  batch_size: 5
+  num_train: 9014
+  num_val: 1001
+  # PUNTA AL NUOVO DATABASE
+  datapath: /data/horse/ws/gigi895h-generative_project/gigi895h-QM9_gen_alpha/generative_pca/dataset2_updated.db
+  num_workers: 6
+  num_val_workers: 4
+  num_test_workers: 4
+  distance_unit: Ang
+  property_units:
+    energy_U0: Hartree
+    gap: eV
+    excitation_energy: eV
+    soc: eV
+  transforms:
+    - _target_: schnetpack.transform.SubtractCenterOfMass
+    - _target_: schnetpack_gschnet.transform.OrderByDistanceToOrigin
+    - _target_: schnetpack_gschnet.transform.GetRelativeAtomicEnergy
+      atom_types: ${globals.atom_types}
+      target_energy_name: energy_U0
+      max_train_points: 9014
+    - _target_: schnetpack_gschnet.transform.GeneralCachedNeighborList
+      cache_path: ${run.path}/${run.id}/cache
+      keep_cache: False
+      cache_workdir: ${globals.cache_workdir}
+      neighbor_list:
+        _target_: schnetpack_gschnet.transform.ConditionalGSchNetNeighborList
+        model_cutoff: ${globals.model_cutoff}
+        prediction_cutoff: ${globals.prediction_cutoff}
+        placement_cutoff: ${globals.placement_cutoff}
+        use_covalent_radii: ${globals.use_covalent_radii}
+        covalent_radius_factor: ${globals.covalent_radius_factor}
+    - _target_: schnetpack_gschnet.transform.BuildAtomsTrajectory
+      centered: True
+      origin_type: ${globals.origin_type}
+      focus_type: ${globals.focus_type}
+      stop_type: ${globals.stop_type}
+      draw_random_samples: ${globals.draw_random_samples}
+      sort_idx_i: False
+    - _target_: schnetpack.transform.CastTo32
+
+callbacks:
+  early_stopping:
+    patience: 25
+  progress_bar:
+    refresh_rate: 100
+
+model:
+  conditioning:
+    _target_: schnetpack_gschnet.ConditioningModule
+    n_features: 128
+    n_layers: 5
+    condition_embeddings:
+      - _target_: schnetpack_gschnet.ScalarConditionEmbedding
+        condition_name: gap
+        condition_min: 0.0
+        condition_max: 13.
+        grid_spacing: 1.0
+        n_features: 64
+        n_layers: 3
+        required_data_properties:
+          - gap
+      - _target_: schnetpack_gschnet.ScalarConditionEmbedding
+        condition_name: excitation_energy
+        condition_min: 0.0
+        condition_max: 11.
+        grid_spacing: 1.0
+        n_features: 64
+        n_layers: 3
+        required_data_properties:
+          - excitation_energy
+      - _target_: schnetpack_gschnet.ScalarConditionEmbedding
+        condition_name: fosc
+        condition_min: 0.0
+        condition_max: 7.
+        grid_spacing: 0.5
+        n_features: 64
+        n_layers: 3
+        required_data_properties:
+          - fosc
+      - _target_: schnetpack_gschnet.ScalarConditionEmbedding
+        condition_name: soc
+        condition_min: 0.0
+        condition_max: 0.05
+        grid_spacing: 0.005
+        n_features: 64
+        n_layers: 3
+        required_data_properties:
+          - soc
+      - _target_: schnetpack_gschnet.ScalarConditionEmbedding
+        condition_name: relative_atomic_energy
+        condition_min: -1.0
+        condition_max: 1.0
+        grid_spacing: 0.2
+        n_features: 64
+        n_layers: 3
+        required_data_properties:
+          - energy_U0
+      # --- NUOVE CONDIZIONI PCA ---
+      - _target_: schnetpack_gschnet.ScalarConditionEmbedding
+        condition_name: pc1
+        condition_min: -4.5 # REGOLA QUESTI VALORI IN BASE ALL'OUTPUT DELLO SCRIPT
+        condition_max: 4.5
+        grid_spacing: 0.1
+        n_features: 64
+        n_layers: 3
+        required_data_properties:
+          - pc1
+      - _target_: schnetpack_gschnet.ScalarConditionEmbedding
+        condition_name: pc2
+        condition_min: -3.5
+        condition_max: 3.5
+        grid_spacing: 0.1
+        n_features: 64
+        n_layers: 3
+        required_data_properties:
+          - pc2

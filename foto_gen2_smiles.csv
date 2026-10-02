@@ -1,0 +1,11 @@
+molecule,smiles
+mol_1,N#CC(C#N)=c1cc(N2CC2=O)c2c(O)c(CO)cc3ccnc1c32
+mol_13,CC(=O)[C@H]1CC(=O)O/C1=C\COc1c(C)c(O)c(Br)c(O)c1C1=CC(Br)=C/C(=C2\Nc3c(oc(=O)c4c3OC[C@H](C)O4)CO2)C1=O
+mol_16,[H]C1=C2C(=NS1)C(N([H])[H])=C(N=C=O)C(C#N)=C2C([H])=C1N2N(N3OC(=O)C([H])=C([H])N13)[C@@]1([H])OC(=O)[C@@]3([H])C(=O)[C@]2([H])[C@]31[H]
+mol_2,CCN1C(=O)[C@@H](C)Oc2c1ccc1c2C(=O)C=C(C)C1=O
+mol_33,CCOc1cc2c(cc1C)[nH]c(=S)c1ccc(Oc3cc(OC/C=C(\C)C(=O)OC)c4c(=O)c5c(O)c(C=O)c(O)cc5cc-4o3)cc12
+mol_34,N=Cc(c(Nc1cc(O)c(O)cc1)oc(c2c(NC)c3)c4c3oc(c(O)c(/C=C/C=C(c5c(O)cc([C@@H](O)C)c(O)c5)/C(O)=N/S(O)=O)cc6O)c6c4=O)c2=O
+mol_40,O=C1/C(=C\O)c2cc(-c3cc(Br)c4c(c3O)C(=O)C=C(C(F)(F)F)C4=O)ccc2-c2cc(O)ccc21
+mol_41,COc1cc(C(=O)C2=C(O)/C(=C(O)/C=C/c3ccc(C)cc3O)C(=O)C=C2)c(O)c(O)c1C=O
+mol_42,CC[C@@H]1Nc2nn([C@@H](C)C(C)(C)C)c(=O)c3c2c2c(c4nc(N)nnc43)C(=O)OCN21
+mol_43,CCCC[C@@H](C)OC(=O)c1c(O)cc2c(oc(=O)c3c(CCC)nc(-c4ccc5c(c4)NC[C@@H](CO)N5)nc32)c1C
