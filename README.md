@@ -928,3 +928,562 @@ The presence of a molecule in the final screened dataset does not imply experime
 - clinical efficacy.
 
 Experimental synthesis, photophysical characterization, biological testing, and toxicological validation are required before any practical or therapeutic application.
+
+# Reproducing the cG-SchNet PDT workflow
+
+The molecular-generation workflow used in this repository follows three consecutive steps:
+
+```text
+1. cG-SchNet training
+        ↓
+2. Conditional molecular generation
+        ↓
+3. Validity, uniqueness and novelty filtering
+```
+
+The core training, generation, and filtering routines are those provided by the `schnetpack-gschnet` implementation. Additional Python scripts included in this project were used to automate the creation and submission of multiple SLURM jobs corresponding to the different combinations of conditioning target values.
+
+The examples below reproduce the workflow used on the HPC system.
+
+---
+
+## 1. Model training
+
+Training is performed using the `gschnet_train` command provided by `schnetpack-gschnet`.
+
+For **Generation 1**, the model was trained with:
+
+```bash
+gschnet_train \
+    --config-dir=/data/horse/ws/gigi895h-QM9_gen_alpha/my_gschnet_multimod_configs \
+    experiment=multicond_experiment_gen1 \
+    data.datapath=/data/horse/ws/gigi895h-QM9_gen_alpha/generative_project/dataset2.db \
+    trainer.accelerator=gpu
+```
+
+The corresponding Hydra configuration is:
+
+```text
+my_gschnet_multimod_configs/experiment/multicond_experiment_gen1.yaml
+```
+
+The same procedure was used for the other generation campaigns by changing the experiment configuration:
+
+```bash
+gschnet_train \
+    --config-dir=/data/horse/ws/gigi895h-QM9_gen_alpha/my_gschnet_multimod_configs \
+    experiment=multicond_experiment_gen2 \
+    data.datapath=/data/horse/ws/gigi895h-QM9_gen_alpha/generative_project/dataset2.db \
+    trainer.accelerator=gpu
+```
+
+```bash
+gschnet_train \
+    --config-dir=/data/horse/ws/gigi895h-QM9_gen_alpha/my_gschnet_multimod_configs \
+    experiment=multicond_experiment_gen3 \
+    data.datapath=<path-to-generation-3-training-database> \
+    trainer.accelerator=gpu
+```
+
+```bash
+gschnet_train \
+    --config-dir=/data/horse/ws/gigi895h-QM9_gen_alpha/my_gschnet_multimod_configs \
+    experiment=multicond_experiment_gen4 \
+    data.datapath=<path-to-generation-4-training-database> \
+    trainer.accelerator=gpu
+```
+
+Generation 3 uses the photosensitizer-restricted training set, whereas Generation 4 uses the database augmented with the PCA-derived conditioning coordinates.
+
+Therefore, the exact database specified through:
+
+```text
+data.datapath=
+```
+
+must correspond to the dataset associated with the selected experiment configuration.
+
+Training output is written to a model directory containing the trained network, Hydra configuration, checkpoints, and the corresponding dataset split.
+
+For example:
+
+```text
+/data/horse/ws/gigi895h-QM9_gen_alpha/generative_project/models/
+└── multicond_experiment/
+    └── 2035167_i8035/
+        ├── ...
+        └── split.npz
+```
+
+The `split.npz` file is subsequently used during the filtering stage to determine whether generated molecules correspond to structures contained in the training, validation, or test subsets.
+
+---
+
+# 2. Conditional molecular generation
+
+After training, molecules are generated using:
+
+```text
+gschnet_generate
+```
+
+A representative Generation 1 command used in this project is:
+
+```bash
+gschnet_generate \
+    modeldir=/data/horse/ws/gigi895h-QM9_gen_alpha/generative_project/models/multicond_experiment/2035167_i8035 \
+    n_molecules=1000 \
+    batch_size=500 \
+    max_n_atoms=280 \
+    ++conditions.excitation_energy=1.8 \
+    ++conditions.gap=1.5 \
+    ++conditions.fosc=0.5 \
+    ++conditions.soc=0.00006 \
+    ++conditions.relative_atomic_energy=-0.005 \
+    outputfile=/data/horse/ws/gigi895h-QM9_gen_alpha/generative_project/generation_1/generated_molecules/structures_1.db
+```
+
+The main generation arguments are:
+
+| Argument | Description |
+|---|---|
+| `modeldir` | Directory containing the trained cG-SchNet model |
+| `n_molecules` | Number of molecular structures requested for the target combination |
+| `batch_size` | Number of structures generated per batch |
+| `max_n_atoms` | Maximum number of atoms allowed in a generated molecule |
+| `++conditions.*` | Target values used for conditional sampling |
+| `outputfile` | ASE database containing the generated 3D structures |
+
+In this workflow:
+
+```text
+n_molecules = 1000
+batch_size  = 500
+max_n_atoms = 280
+```
+
+were used for each target-value combination.
+
+---
+
+## Target-value combinations
+
+cG-SchNet requires a value for every conditioning variable used during training.
+
+Instead of performing only one generation run, all desired combinations of the target values were sampled independently.
+
+For a fully conditioned model, a generic combination has the form:
+
+```bash
+gschnet_generate \
+    modeldir=<trained-model-directory> \
+    n_molecules=1000 \
+    batch_size=500 \
+    max_n_atoms=280 \
+    ++conditions.excitation_energy=<E_exc> \
+    ++conditions.gap=<E_gap> \
+    ++conditions.fosc=<f_osc> \
+    ++conditions.soc=<SOC> \
+    ++conditions.relative_atomic_energy=-0.005 \
+    outputfile=<output-database>
+```
+
+Thus, each combination of:
+
+```text
+excitation energy
+× HOMO-LUMO gap
+× oscillator strength
+× SOC
+× relative atomic energy
+```
+
+corresponds to an independent cG-SchNet generation run.
+
+For models containing fewer conditioning variables, only the conditions used during training are passed to `gschnet_generate`.
+
+For example, a reduced model conditioned only on excitation energy and relative atomic energy follows the general form:
+
+```bash
+gschnet_generate \
+    modeldir=<trained-model-directory> \
+    n_molecules=1000 \
+    batch_size=500 \
+    max_n_atoms=280 \
+    ++conditions.excitation_energy=<E_exc> \
+    ++conditions.relative_atomic_energy=-0.005 \
+    outputfile=<output-database>
+```
+
+Generation 4 additionally includes the PCA-derived conditioning variables:
+
+```bash
+++conditions.pc1=<PC1>
+++conditions.pc2=<PC2>
+```
+
+together with the corresponding quantum-mechanical conditioning properties.
+
+The exact condition names must match those defined in the YAML configuration used to train the model.
+
+---
+
+# 3. Automated generation of SLURM jobs
+
+Because many combinations of target values had to be evaluated independently, generation was automated rather than launching each `gschnet_generate` command manually.
+
+Two helper scripts were used:
+
+```text
+create_generation.py
+run_generation.py
+```
+
+## `create_generation.py`
+
+`create_generation.py` generates the individual SLURM generation scripts:
+
+```text
+generation.slurm
+```
+
+for the different combinations of target conditioning values.
+
+Conceptually, the script constructs commands of the form:
+
+```bash
+gschnet_generate \
+    modeldir=<model-directory> \
+    n_molecules=1000 \
+    batch_size=500 \
+    max_n_atoms=280 \
+    ++conditions.<property1>=<value1> \
+    ++conditions.<property2>=<value2> \
+    ... \
+    outputfile=<structures_N.db>
+```
+
+for every required target combination.
+
+It can be launched with:
+
+```bash
+python create_generation.py
+```
+
+The generated jobs produce ASE databases such as:
+
+```text
+structures_1.db
+structures_2.db
+structures_3.db
+...
+```
+
+where each database corresponds to one conditioning-value combination.
+
+---
+
+## `run_generation.py`
+
+The resulting generation jobs are submitted using:
+
+```bash
+python run_generation.py
+```
+
+`run_generation.py` automates submission of the generated:
+
+```text
+generation.slurm
+```
+
+jobs to the HPC scheduler.
+
+The generation workflow is therefore:
+
+```text
+trained model
+     │
+     ▼
+create_generation.py
+     │
+     ▼
+generation.slurm jobs
+     │
+     ▼
+run_generation.py
+     │
+     ▼
+gschnet_generate
+     │
+     ▼
+structures_1.db
+structures_2.db
+structures_3.db
+...
+```
+
+---
+
+# 4. Filtering generated molecules
+
+The raw structures produced by cG-SchNet must subsequently be checked for chemical validity and duplicate molecular graphs.
+
+The filtering procedure uses the standard:
+
+```text
+check_validity.py
+```
+
+script provided by `schnetpack-gschnet`.
+
+For example, one of the filtering commands used for Generation 1 was:
+
+```bash
+python /data/horse/ws/gigi895h-QM9_gen_alpha/schnetpack-gschnet/src/scripts/check_validity.py \
+    structures_1.db \
+    --compute_uniqueness \
+    --compare_db_path /data/horse/ws/gigi895h-QM9_gen_alpha/generative_project/dataset2.db \
+    --compare_db_split_path /data/horse/ws/gigi895h-QM9_gen_alpha/generative_project/models/multicond_experiment/2035167_i8035/split.npz \
+    --ignore_enantiomers \
+    --timeout 2 \
+    --results_db_path auto \
+    --results_db_flags unique
+```
+
+The relevant options are:
+
+| Option | Purpose |
+|---|---|
+| `structures_1.db` | Database containing raw cG-SchNet-generated structures |
+| `--compute_uniqueness` | Identifies duplicate generated molecular graphs |
+| `--compare_db_path` | Compares generated molecules with the reference dataset |
+| `--compare_db_split_path` | Uses the model split to identify training/validation/test matches |
+| `--ignore_enantiomers` | Treats mirror-image stereoisomers as equivalent during comparison |
+| `--timeout 2` | Limits excessively long 3D-to-molecular-graph conversion attempts |
+| `--results_db_path auto` | Automatically determines the output database path |
+| `--results_db_flags unique` | Stores the structures satisfying the uniqueness criterion |
+
+With:
+
+```text
+--results_db_path auto
+```
+
+the filtered database is automatically written alongside the original generated database.
+
+---
+
+# 5. Automated filtering of all generation databases
+
+Since every target-value combination generates an independent:
+
+```text
+structures_N.db
+```
+
+database, the filtering procedure was also automated.
+
+Two helper scripts were used:
+
+```text
+cp_filter.py
+run_filter.py
+```
+
+## `cp_filter.py`
+
+`cp_filter.py` prepares the filtering jobs for the generated molecular databases.
+
+For every generation database, it creates the corresponding filtering command based on:
+
+```bash
+python <path-to-schnetpack-gschnet>/src/scripts/check_validity.py \
+    <structures_N.db> \
+    --compute_uniqueness \
+    --compare_db_path <training-database> \
+    --compare_db_split_path <model-directory>/split.npz \
+    --ignore_enantiomers \
+    --timeout 2 \
+    --results_db_path auto \
+    --results_db_flags unique
+```
+
+and writes the associated:
+
+```text
+filter.slurm
+```
+
+job files.
+
+The script is run with:
+
+```bash
+python cp_filter.py
+```
+
+---
+
+## `run_filter.py`
+
+The filtering SLURM jobs are then submitted using:
+
+```bash
+python run_filter.py
+```
+
+This executes the generated:
+
+```text
+filter.slurm
+```
+
+jobs across all databases produced during conditional generation.
+
+The complete filtering sequence is:
+
+```text
+structures_1.db
+structures_2.db
+structures_3.db
+       ...
+        │
+        ▼
+   cp_filter.py
+        │
+        ▼
+   filter.slurm
+        │
+        ▼
+   run_filter.py
+        │
+        ▼
+ check_validity.py
+        │
+        ▼
+valid + unique molecular structures
+```
+
+---
+
+# 6. Complete HPC workflow
+
+The complete sequence used to train the models, generate molecules, and filter the resulting structures is:
+
+```text
+Hydra experiment YAML
+        │
+        ▼
+   gschnet_train
+        │
+        ▼
+ trained cG-SchNet model
+        │
+        ├── checkpoints
+        └── split.npz
+        │
+        ▼
+create_generation.py
+        │
+        ▼
+ generation.slurm
+        │
+        ▼
+run_generation.py
+        │
+        ▼
+ gschnet_generate
+        │
+        ▼
+structures_1.db
+structures_2.db
+structures_3.db
+       ...
+        │
+        ▼
+   cp_filter.py
+        │
+        ▼
+    filter.slurm
+        │
+        ▼
+   run_filter.py
+        │
+        ▼
+ check_validity.py
+        │
+        ▼
+Valid and unique generated structures
+        │
+        ▼
+Aggregation across target combinations
+        │
+        ▼
+SMILES-based cross-deduplication
+        │
+        ▼
+generation_1.csv
+generation_2.csv
+generation_3.csv
+generation_4.csv
+```
+
+---
+
+# Minimal command sequence
+
+For a single experiment and a single target-value combination, the essential sequence is therefore:
+
+### 1. Train
+
+```bash
+gschnet_train \
+    --config-dir=/data/horse/ws/gigi895h-QM9_gen_alpha/my_gschnet_multimod_configs \
+    experiment=multicond_experiment_gen1 \
+    data.datapath=/data/horse/ws/gigi895h-QM9_gen_alpha/generative_project/dataset2.db \
+    trainer.accelerator=gpu
+```
+
+### 2. Generate
+
+```bash
+gschnet_generate \
+    modeldir=/data/horse/ws/gigi895h-QM9_gen_alpha/generative_project/models/multicond_experiment/2035167_i8035 \
+    n_molecules=1000 \
+    batch_size=500 \
+    max_n_atoms=280 \
+    ++conditions.excitation_energy=1.8 \
+    ++conditions.gap=1.5 \
+    ++conditions.fosc=0.5 \
+    ++conditions.soc=0.00006 \
+    ++conditions.relative_atomic_energy=-0.005 \
+    outputfile=/data/horse/ws/gigi895h-QM9_gen_alpha/generative_project/generation_1/generated_molecules/structures_1.db
+```
+
+### 3. Filter
+
+```bash
+python /data/horse/ws/gigi895h-QM9_gen_alpha/schnetpack-gschnet/src/scripts/check_validity.py \
+    /data/horse/ws/gigi895h-QM9_gen_alpha/generative_project/generation_1/generated_molecules/structures_1.db \
+    --compute_uniqueness \
+    --compare_db_path /data/horse/ws/gigi895h-QM9_gen_alpha/generative_project/dataset2.db \
+    --compare_db_split_path /data/horse/ws/gigi895h-QM9_gen_alpha/generative_project/models/multicond_experiment/2035167_i8035/split.npz \
+    --ignore_enantiomers \
+    --timeout 2 \
+    --results_db_path auto \
+    --results_db_flags unique
+```
+
+For the complete production workflow, these individual commands were generated and submitted automatically using:
+
+```bash
+python create_generation.py
+python run_generation.py
+
+python cp_filter.py
+python run_filter.py
+```
+
+This automation enabled all requested combinations of cG-SchNet conditioning values to be generated and filtered independently using the HPC scheduler.
